@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Ваша аватарка</h1>
+<img src="/static/img/img.jpg">
+
+<h1>Поменять аватарку</h1>
+<form method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="photo">Выберите файл</label>
+        <input type="file" class="form-control-file" id="photo" name="file">
+    </div>
+    <button type="submit" class="btn btn-primary">Отправить</button>
+</form>
+{% endblock %}

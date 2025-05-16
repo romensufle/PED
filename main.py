@@ -5,6 +5,8 @@ from data import db_session
 from data.user import User
 from forms.login import LoginForm
 from forms.register_form import RegisterForm
+import os
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -37,15 +39,19 @@ def profile():
     return render_template('base.html', title='Это ваш профиль')
 
 
-# @app.route('/image', methods=['POST', 'GET'])
-# def load_photo():
-#     if request.method == 'GET':
-#         return render_template('load_photo.html')
-#     elif request.method == 'POST':
-#         photo = request.files['file']  # получение файла
-#         with open('static/img/img.jpg', mode='wb') as f:
-#             f.write(photo.read())
-#         return render_template('show_photo.html')
+@app.route('/image', methods=['POST', 'GET'])
+def load_photo():
+    file_path = 'static/img/img.jpg'
+    if os.path.exists(file_path) and request.method == 'GET':
+        return render_template('show_photo.html')
+    else:
+        if request.method == 'GET':
+            return render_template('load_photo.html')
+        elif request.method == 'POST':
+            photo = request.files['file']  # получение файла
+            with open('static/img/img.jpg', mode='wb') as f:
+                f.write(photo.read())
+            return render_template('show_photo.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
