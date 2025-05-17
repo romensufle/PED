@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request, redirect
-from flask_login import login_user, LoginManager
+from flask_login import login_user, LoginManager, login_required, logout_user
 
 from data import db_session
 from data.user import User
+from data.posts import Posts
 from forms.login import LoginForm
 from forms.register_form import RegisterForm
 import os
-
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -53,6 +53,7 @@ def load_photo():
                 f.write(photo.read())
             return render_template('show_photo.html')
 
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
@@ -81,10 +82,12 @@ def register():
                                form=form, message='Пользователь зарегестрирован!')
     return render_template('register.html', form=form)
 
+
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -99,6 +102,13 @@ def login():
                                message="Неправильный логин или пароль",
                                form=form)
     return render_template('auth.html', form=form)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect("/")
 
 
 @app.route('/publication')

@@ -42,8 +42,11 @@
             Профиль
           </a>
           <ul class="dropdown-menu">
+            {% if not current_user.is_authenticated  %}
             <li><a class="dropdown-item" href="/login">Войти</a></li>
+            {% endif %}
             {% if current_user.is_authenticated  %}
+            <li><a class="dropdown-item" href="/logout">Выйти</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="/image">Фото профиля</a></li>
             <li><hr class="dropdown-divider"></li>

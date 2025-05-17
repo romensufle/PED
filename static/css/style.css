@@ -7,3 +7,14 @@ form.login_form {
     border-radius: 5px;
     padding: 10px;
 }
+img {
+    max-width: 300px;
+    max-height: 200px;
+}
+box {
+  border: 6px solid #949599;
+  height: 100px;
+  margin: 20px;
+  padding: 20px;
+  width: 400px;
+}
