@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+.p_1 {
+      margin:0
+    }
+
+</style>
+<h1>Комментарии к задаче {{name}}</h1>
+<a class="btn btn-primary" href=/comments_form/{{task_id}}/{{name}}>Написать комментарий</a>
+{% for comment in comments %}
+<div class="col-md6 border rounded">
+    <h4>Комментарий пользователя {{comment.user.name}}</h4>
+    <p></p>
+    <div>
+    {% for el in comment.text.split('\n')%}
+        <p class="p_1">{{el}}</p>
+    {% endfor %}
+    </div>
+    <p></p>
+    <div>
+        Дата написания - {{comment.date}}
+    </div>
+    <p></p>
+</div>
+{% endfor %}
+{% endblock %}

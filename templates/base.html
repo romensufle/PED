@@ -33,9 +33,11 @@
           <a class="nav-link active" aria-current="page" href="/we">О нас</a>
         </li>
 
+        {% if not current_user.is_authenticated  %}
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="/register">Регистрация</a>
         </li>
+        {% endif %}
 
         <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -50,7 +52,7 @@
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="/image">Фото профиля</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="/">Публикации пользователя</a></li>
+            <li><a class="dropdown-item" href="/my_tasks">Публикации пользователя</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="/publication">Опубликовать задачу</a></li>
             {% endif %}

@@ -1,11 +1,14 @@
 from flask import Flask, render_template, request, redirect
-from flask_login import login_user, LoginManager, login_required, logout_user
+from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 
 from data import db_session
 from data.user import User
 from data.posts import Posts
 from forms.login import LoginForm
 from forms.register_form import RegisterForm
+from forms.posts_form import PostForm
+from forms.comments_form import CommentForm
+from data.comments import Comments
 import os
 
 app = Flask(__name__)
@@ -15,14 +18,25 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 
-@app.route('/')
+@app.route("/")
 def index():
-    return render_template('base.html', title='Сайт для ежедневного решения задач')
+    sess = db_session.create_session()
+    posts = sess.query(Posts).filter(Posts.user_id == '1')
+    return render_template("index.html", posts=posts)
 
 
 @app.route('/users_tasks')
 def utasks():
-    return render_template('base.html', title='Пользовательские задачи')
+    sess = db_session.create_session()
+    posts = sess.query(Posts).filter(Posts.user_id != '1')
+    return render_template('index.html', title='Пользовательские задачи', posts=posts)
+
+
+@app.route('/my_tasks')
+def my_tasks():
+    sess = db_session.create_session()
+    posts = sess.query(Posts).filter(Posts.user_id == current_user.id)
+    return render_template('index.html', title='Пользовательские задачи', posts=posts)
 
 
 @app.route('/we')
@@ -73,7 +87,7 @@ def register():
             surname=form.surname.data,
             age=form.age.data,
             fav_prog_lang=form.fav_prog_lang.data,
-            email=form.email.data
+            email=form.email.data,
         )
         user.set_password(form.password.data)
         sess.add(user)
@@ -96,7 +110,7 @@ def login():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
-            login_user(user, remember=form.remember_me.data)
+            login_user(user)
             return redirect("/")
         return render_template('auth.html',
                                message="Неправильный логин или пароль",
@@ -111,9 +125,52 @@ def logout():
     return redirect("/")
 
 
-@app.route('/publication')
+@app.route('/publication', methods=['GET', 'POST'])
+@login_required
 def publication():
-    return render_template('base.html', title='Здесь вы оформляете свою задачу')
+    form = PostForm()
+    if request.method == 'POST':
+        sess = db_session.create_session()
+
+        post = Posts(
+            name=form.name.data,
+            hard=form.hard.data,
+            text=form.text.data,
+            decision=form.decision.data,
+            user_id=current_user.id
+        )
+        current_user.posts.append(post)
+        sess.merge(current_user)
+        sess.commit()
+        return render_template('posts.html',
+                               form=form, message='Задача опубликована!')
+    return render_template('posts.html', form=form)
+
+
+@app.route('/comments/<task_id>/<name_of_task>')
+def comments(task_id, name_of_task):
+    sess = db_session.create_session()
+    comments = sess.query(Comments).filter(Comments.post_id == task_id)
+    return render_template('comments.html', task_id=task_id, name=name_of_task, comments=comments)
+
+
+@app.route('/comments_form/<task_id>/<name>', methods=['GET', 'POST'])
+@login_required
+def comments_form(task_id, name):
+    form = CommentForm()
+    if request.method == 'POST':
+        sess = db_session.create_session()
+
+        comm = Comments(
+            text=form.text.data,
+            post_id=task_id,
+            user_id=current_user.id
+        )
+        sess.add(comm)
+        sess.merge(current_user)
+        sess.commit()
+        return redirect(f'/comments/{task_id}/{name}')
+    return render_template('comment_form.html', form=form)
 
 
 def main():

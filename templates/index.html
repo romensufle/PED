@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .spoiler {
+      padding: 1em;
+      text-shadow: 0 0 10px #000;
+      color: transparent;
+      transition: 0.5s;
+    }
+    .spoiler:hover {
+      text-shadow: none;
+      color: currentColor;
+    }
+    .p_1 {
+      margin:0
+    }
+
+</style>
+<h1>Задачи</h1>
+{% for post in posts %}
+<div class="col-md6 border rounded">
+    <h2>{{post.name}}</h2>
+    <p></p>
+    <h4>Сложность - {{post.hard}}</h4>
+    <div>
+        {{post.text}}
+    </div>
+    <p></p>
+    <h4>Решение</h4>
+
+    <div class="spoiler">
+    {% for el in post.decision.split('\n') %}
+        <p class="p_1">{{el}}</p>
+    {% endfor %}
+    </div>
+
+    <p></p>
+    <div>
+        Автор - {{post.user.name}}, Дата написания - {{post.date}}
+    </div>
+    <p></p>
+    <div>
+        <a class="btn btn-primary" href=comments/{{post.id}}/{{post.name}}>Открыть комментарии</a>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
